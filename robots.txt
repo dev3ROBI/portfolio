@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /config/
+Disallow: /includes/
+Disallow: /uploads/
+Disallow: /assets/
+Allow: /assets/css/
+Allow: /assets/js/
+Allow: /assets/images/
+
+Sitemap: https://me.robicodes.xyz/sitemap.xml

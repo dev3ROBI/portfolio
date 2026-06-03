@@ -1,0 +1,26 @@
+{
+  "name": "RobiCodes - Robiul Islam Portfolio",
+  "short_name": "RobiCodes",
+  "description": "Professional Web & API Developer Portfolio",
+  "start_url": "/index.php",
+  "display": "standalone",
+  "background_color": "#0a0a1a",
+  "theme_color": "#6c5ce7",
+  "icons": [
+    {
+      "src": "assets/icons/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "assets/icons/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icons/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
