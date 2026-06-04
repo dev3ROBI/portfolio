@@ -4,6 +4,7 @@
  * Contact form with PHP mail integration, validation, and social media links
  */
 require_once 'config/database.php';
+require_once 'includes/mailer.php';
 
 $pageTitle = 'Contact';
 $pageDescription = 'Get in touch with Robiul Islam (RobiCodes). Send a message, discuss a project, or just say hello.';
@@ -18,7 +19,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
     // Verify CSRF token
     $csrfToken = $_POST['csrf_token'] ?? '';
     if (!verifyCSRFToken($csrfToken)) {
-        echo json_encode(['success' => false, 'message' => 'Invalid form submission. Please refresh and try again.']);
+        echo json_encode(['success' => false, 'message' => 'Invalid form submission.']);
+        securityLog("CSRF mismatch on contact form", "danger");
         exit;
     }
     
@@ -46,21 +48,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
                 [$name, $email, $subject, $message, $ip, $ua]
             );
             
-            // Send email notification (sanitize headers to prevent injection)
+            // Send email notification securely
             $to = 'iam.robi693@gmail.com';
-            $safeSubject = str_replace(["\r", "\n"], '', $subject);
-            $safeName = str_replace(["\r", "\n"], '', $name);
-            $emailSubject = "Portfolio Contact: $safeSubject";
-            $emailBody = "Name: $safeName\nEmail: $email\nSubject: $safeSubject\n\nMessage:\n$message";
+            $emailSent = sendSecureEmail($to, $subject, $message, $email, $name);
             
-            $safeEmail = filter_var($email, FILTER_SANITIZE_EMAIL);
-            $emailHeaders = "From: $safeEmail\r\nReply-To: $safeEmail";
-            
-            mail($to, $emailSubject, $emailBody, $emailHeaders);
-            
-            echo json_encode(['success' => true, 'message' => 'Message sent successfully!']);
+            if ($emailSent) {
+                echo json_encode(['success' => true, 'message' => 'Message sent successfully!']);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Database saved, but email notification failed.']);
+            }
         } catch (Exception $e) {
-            echo json_encode(['success' => false, 'message' => 'Failed to send message. Please try again.']);
+            securityLog("Contact Form Error: " . $e->getMessage(), "danger");
+            echo json_encode(['success' => false, 'message' => 'Failed to process message. Please try again.']);
         }
     } else {
         echo json_encode(['success' => false, 'message' => implode(' ', $errors)]);

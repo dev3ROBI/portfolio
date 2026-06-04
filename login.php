@@ -7,9 +7,33 @@ require_once 'config/database.php';
 
 $error = '';
 
+// Login rate limiting
+$maxAttempts = 5;
+$lockoutTime = 900; // 15 minutes
+
+if (!isset($_SESSION['login_attempts'])) {
+    $_SESSION['login_attempts'] = [];
+}
+
+// Clean expired attempts
+$_SESSION['login_attempts'] = array_filter($_SESSION['login_attempts'], function($time) use ($lockoutTime) {
+    return $time > (time() - $lockoutTime);
+});
+
+$isLocked = count($_SESSION['login_attempts']) >= $maxAttempts;
+
+if ($isLocked) {
+    $remaining = $lockoutTime - (time() - min($_SESSION['login_attempts']));
+    $error = 'Too many login attempts. Please try again in ' . ceil($remaining / 60) . ' minutes.';
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
+    if ($isLocked) {
+        $error = 'Too many login attempts. Please try again later.';
+        securityLog("Rate limit hit for user login attempt", "warning");
+    } elseif (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
         $error = 'Invalid form submission.';
+        securityLog("CSRF mismatch on login attempt", "danger");
     } else {
         $login = trim($_POST['login'] ?? '');
         $password = $_POST['password'] ?? '';
@@ -22,11 +46,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             );
             
             if ($user && password_verify($password, $user['password_hash'])) {
+                // Clear attempts on success
+                $_SESSION['login_attempts'] = [];
                 session_regenerate_id(true);
                 $_SESSION['user_id'] = $user['id'];
                 $_SESSION['user_username'] = $user['username'];
                 $_SESSION['user_display_name'] = $user['display_name'];
                 $_SESSION['user_role'] = $user['role'];
+                
+                securityLog("Successful login: " . $user['username'], "info");
                 
                 // Update last login
                 dbExecute("UPDATE users SET last_login = NOW() WHERE id = ?", 'i', [$user['id']]);
@@ -39,7 +67,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
                 exit;
             } else {
+                $_SESSION['login_attempts'][] = time();
                 $error = 'Invalid credentials or account suspended.';
+                securityLog("Failed login attempt for: " . $login, "warning");
             }
         } else {
             $error = 'Please enter all fields.';

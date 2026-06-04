@@ -6,14 +6,28 @@
  * Implements singleton pattern for connection reuse.
  */
 
+// Load environment variables from .env file
+function loadEnv($path) {
+    if (!file_exists($path)) return;
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line) {
+        if (strpos(trim($line), '#') === 0) continue;
+        list($name, $value) = explode('=', $line, 2);
+        putenv(trim($name) . '=' . trim($value));
+    }
+}
+loadEnv(__DIR__ . '/../.env');
+
+define('ENVIRONMENT', getenv('ENVIRONMENT') ?: 'production');
+
 // Secure session configuration
 if (session_status() === PHP_SESSION_NONE) {
     // Set security headers
-    header("X-Frame-Options: DENY");
+    header("X-Frame-Options: SAMEORIGIN");
     header("X-Content-Type-Options: nosniff");
     header("Referrer-Policy: strict-origin-when-cross-origin");
     header("Permissions-Policy: geolocation=(), camera=(), microphone=()");
-    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';");
 
     if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
         header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
@@ -31,11 +45,33 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// Session timeout check (30 minutes)
+if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > 1800)) {
+    session_unset();
+    session_destroy();
+}
+$_SESSION['last_activity'] = time();
+
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_NAME', getenv('DB_NAME') ?: 'robicodes_portfolio');
 define('DB_USER', getenv('DB_USER') ?: 'root');
 define('DB_PASS', getenv('DB_PASS') ?: '');
 define('DB_CHARSET', 'utf8mb4');
+
+/**
+ * Security Event Logger
+ * 
+ * @param string $event Description of the event
+ * @param string $level Severity level (info, warning, danger)
+ */
+function securityLog(string $event, string $level = 'info'): void {
+    $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
+    $timestamp = date('Y-m-d H:i:s');
+    $logEntry = "[$timestamp] [$level] [$ip] $event" . PHP_EOL;
+    $logDir = __DIR__ . '/../logs';
+    if (!is_dir($logDir)) mkdir($logDir, 0755, true);
+    file_put_contents($logDir . '/security.log', $logEntry, FILE_APPEND);
+}
 
 /**
  * Get database connection (singleton)

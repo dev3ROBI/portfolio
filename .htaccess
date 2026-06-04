@@ -41,6 +41,15 @@ RewriteRule ^config/ - [F,L]
 # Block access to includes directory
 RewriteRule ^includes/ - [F,L]
 
+# Block access to logs directory
+RewriteRule ^logs/ - [F,L]
+
+# Prevent script injection in query strings
+RewriteCond %{QUERY_STRING} (<|%3C).*script.*(>|%3E) [NC,OR]
+RewriteCond %{QUERY_STRING} GLOBALS(=|[|%[0-9A-Z]{0,2}) [OR]
+RewriteCond %{QUERY_STRING} _REQUEST(=|[|%[0-9A-Z]{0,2})
+RewriteRule ^(.*)$ index.php [F,L]
+
 # Block PHP execution in uploads directory
 RewriteRule ^uploads/.*\.(php|phtml|php3|php4|php5)$ - [F,L]
 

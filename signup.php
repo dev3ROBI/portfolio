@@ -17,9 +17,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
         $displayName = trim($_POST['display_name'] ?? '');
+        $masterKey = $_POST['master_key'] ?? '';
 
-        if (empty($username) || empty($email) || empty($password) || empty($displayName)) {
+        if (empty($username) || empty($email) || empty($password) || empty($displayName) || empty($masterKey)) {
             $error = 'All fields are required.';
+        } elseif ($masterKey !== getenv('SIGNUP_MASTER_KEY')) {
+            $error = 'Invalid master key. Registration restricted.';
+            securityLog("Unauthorized signup attempt with invalid master key", "warning");
         } elseif ($password !== $confirmPassword) {
             $error = 'Passwords do not match.';
         } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
@@ -95,6 +99,11 @@ include 'includes/header.php';
             <div class="form-group">
                 <label for="confirm_password">Confirm Password</label>
                 <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm password" required>
+            </div>
+
+            <div class="form-group">
+                <label for="master_key">Registration Master Key</label>
+                <input type="password" id="master_key" name="master_key" placeholder="Enter registration key" required>
             </div>
 
             <button type="submit" class="btn btn--primary">Sign Up</button>
