@@ -4,18 +4,73 @@
  * Dynamic project cards with category filtering, search, and detailed views
  */
 require_once 'config/database.php';
-$pageTitle = 'Projects';
-$pageDescription = 'Explore my portfolio of web applications, APIs, mobile apps, and development tools. Featuring DreamBD, Quran API, Hadith API, and more.';
+
+// Handle project details view
+$detailedProject = null;
+if (isset($_GET['id']) && is_numeric($_GET['id'])) {
+    $detailedProject = dbGetRow(
+        "SELECT p.*, c.name as category_name FROM projects p 
+         LEFT JOIN categories c ON p.category_id = c.id 
+         WHERE p.id = ?", 
+        'i', 
+        [(int)$_GET['id']]
+    );
+}
+
+$pageTitle = $detailedProject ? $detailedProject['title'] : 'Projects';
+$pageDescription = $detailedProject ? substr(strip_tags($detailedProject['description']), 0, 160) : 'Explore my portfolio...';
 include 'includes/header.php';
 
-$categories = dbGetAll("SELECT * FROM categories ORDER BY name ASC");
-$projects = dbGetAll(
-    "SELECT p.*, c.name as category_name, c.slug as category_slug 
-     FROM projects p 
-     LEFT JOIN categories c ON p.category_id = c.id 
-     ORDER BY p.featured DESC, p.sort_order ASC, p.created_at DESC"
-);
+if ($detailedProject): 
+    $techs = json_decode($detailedProject['technologies'] ?? '[]', true);
 ?>
+
+<section class="section hero" style="min-height:auto;padding-top:10rem">
+    <div class="container">
+        <div class="project-detail glass-card reveal">
+            <div class="project-detail__grid">
+                <div class="project-detail__image">
+                    <?php if ($detailedProject['thumbnail']): ?>
+                        <img src="<?php echo sanitizeOutput($detailedProject['thumbnail']); ?>" alt="<?php echo sanitizeOutput($detailedProject['title']); ?>">
+                    <?php else: ?>
+                        <div class="project-detail__placeholder"><i class="fas fa-code"></i></div>
+                    <?php endif; ?>
+                </div>
+                <div class="project-detail__content">
+                    <div class="project-detail__header">
+                        <span class="project-card__category"><?php echo sanitizeOutput($detailedProject['category_name'] ?? 'Web'); ?></span>
+                        <h1 class="project-detail__title"><?php echo sanitizeOutput($detailedProject['title']); ?></h1>
+                    </div>
+                    
+                    <div class="project-detail__desc">
+                        <?php echo nl2br(sanitizeOutput($detailedProject['full_description'] ?? $detailedProject['description'])); ?>
+                    </div>
+
+                    <div class="project-detail__meta">
+                        <h3>Technologies</h3>
+                        <div class="project-card__techs">
+                            <?php foreach ($techs as $tech): ?>
+                                <span class="project-card__tech"><?php echo sanitizeOutput($tech); ?></span>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
+
+                    <div class="project-detail__actions" style="margin-top:2rem;display:flex;gap:1rem">
+                        <?php if ($detailedProject['live_url']): ?>
+                            <a href="<?php echo sanitizeOutput($detailedProject['live_url']); ?>" target="_blank" class="btn btn--primary">Live Demo</a>
+                        <?php endif; ?>
+                        <?php if ($detailedProject['github_url']): ?>
+                            <a href="<?php echo sanitizeOutput($detailedProject['github_url']); ?>" target="_blank" class="btn btn--secondary">View Code</a>
+                        <?php endif; ?>
+                        <a href="projects.php" class="btn btn--ghost">Back to List</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<?php else: ?>
 
 <section class="section hero" style="min-height:auto;padding-top:8rem" aria-label="Projects">
     <div class="container">
@@ -64,43 +119,40 @@ $projects = dbGetAll(
                              alt="<?php echo sanitizeOutput($project['title']); ?>" 
                              loading="lazy">
                     <?php else: ?>
-                        <i class="fas fa-code" style="font-size:2rem;color:var(--text-muted)"></i>
+                        <div class="project-card__placeholder">
+                            <i class="fas fa-code"></i>
+                        </div>
                     <?php endif; ?>
-                    <?php if ($project['featured']): ?>
-                        <span class="project-card__featured">Featured</span>
-                    <?php endif; ?>
+                    <div class="project-card__overlay">
+                        <div class="project-card__actions">
+                            <?php if ($project['github_url']): ?>
+                                <a href="<?php echo sanitizeOutput($project['github_url']); ?>" 
+                                   target="_blank" rel="noopener noreferrer" 
+                                   class="btn-icon" aria-label="View Code"><i class="fab fa-github"></i></a>
+                            <?php endif; ?>
+                            <?php if ($project['live_url']): ?>
+                                <a href="<?php echo sanitizeOutput($project['live_url']); ?>" 
+                                   target="_blank" rel="noopener noreferrer" 
+                                   class="btn-icon" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
                 <div class="project-card__body">
+                    <div class="project-card__header">
+                        <span class="project-card__category"><?php echo sanitizeOutput($project['category_name'] ?? 'Web'); ?></span>
+                        <?php if ($project['featured']): ?>
+                            <span class="project-card__badge">Featured</span>
+                        <?php endif; ?>
+                    </div>
                     <h3 class="project-card__title"><?php echo sanitizeOutput($project['title']); ?></h3>
                     <p class="project-card__description"><?php echo sanitizeOutput($project['description']); ?></p>
-                    
-                    <?php if (!empty($techs)): ?>
-                    <div class="project-card__techs">
-                        <?php foreach ($techs as $tech): ?>
-                            <span class="project-card__tech"><?php echo sanitizeOutput($tech); ?></span>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <div class="project-card__actions">
-                        <?php if ($project['github_url']): ?>
-                            <a href="<?php echo sanitizeOutput($project['github_url']); ?>" 
-                               target="_blank" rel="noopener noreferrer" 
-                               class="btn btn--ghost btn--sm">
-                                <i class="fas fa-link"></i> Source
-                            </a>
-                        <?php endif; ?>
-                        <?php if ($project['live_url']): ?>
-                            <a href="<?php echo sanitizeOutput($project['live_url']); ?>" 
-                               target="_blank" rel="noopener noreferrer" 
-                               class="btn btn--primary btn--sm">
-                                <i class="fas fa-rocket"></i> Live Demo
-                            </a>
-                        <?php else: ?>
-                            <span class="btn btn--ghost btn--sm" style="opacity:0.5;cursor:default">
-                                <i class="fas fa-lock"></i> Private
-                            </span>
-                        <?php endif; ?>
+                    <div class="project-card__footer">
+                        <div class="project-card__techs">
+                            <?php foreach (array_slice($techs, 0, 4) as $tech): ?>
+                                <span class="project-card__tech"><?php echo sanitizeOutput($tech); ?></span>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
             </article>
@@ -108,5 +160,7 @@ $projects = dbGetAll(
         </div>
     </div>
 </section>
+
+<?php endif; ?>
 
 <?php include 'includes/footer.php'; ?>

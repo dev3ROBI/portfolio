@@ -20,11 +20,17 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     display_name VARCHAR(100) NOT NULL,
     avatar VARCHAR(255) DEFAULT NULL,
-    role ENUM('admin', 'editor') DEFAULT 'admin',
+    role ENUM('admin', 'user', 'guest') DEFAULT 'user',
+    status ENUM('active', 'pending', 'suspended') DEFAULT 'active',
+    verification_token VARCHAR(255) DEFAULT NULL,
+    token_expiry DATETIME DEFAULT NULL,
+    last_login DATETIME DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_email (email),
-    INDEX idx_username (username)
+    INDEX idx_username (username),
+    INDEX idx_role (role),
+    INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Insert default admin (password: admin123)

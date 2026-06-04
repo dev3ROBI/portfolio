@@ -8,6 +8,17 @@
 
 // Secure session configuration
 if (session_status() === PHP_SESSION_NONE) {
+    // Set security headers
+    header("X-Frame-Options: DENY");
+    header("X-Content-Type-Options: nosniff");
+    header("Referrer-Policy: strict-origin-when-cross-origin");
+    header("Permissions-Policy: geolocation=(), camera=(), microphone=()");
+    header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com; img-src 'self' data: https:; connect-src 'self';");
+
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        header("Strict-Transport-Security: max-age=31536000; includeSubDomains; preload");
+    }
+
     ini_set('session.cookie_httponly', 1);
     ini_set('session.use_strict_mode', 1);
     ini_set('session.cookie_samesite', 'Strict');
@@ -169,4 +180,48 @@ function getBaseURL(): string {
     $path = dirname($_SERVER['SCRIPT_NAME']);
     
     return rtrim($protocol . $host . $path, '/');
+}
+
+/**
+ * Check if user has a specific role
+ * 
+ * @param string|array $roles Role name or array of role names
+ * @return bool
+ */
+function hasRole($roles): bool {
+    if (!isset($_SESSION['user_role'])) {
+        return false;
+    }
+    
+    if (is_array($roles)) {
+        return in_array($_SESSION['user_role'], $roles);
+    }
+    
+    return $_SESSION['user_role'] === $roles;
+}
+
+/**
+ * Require a specific role or redirect
+ * 
+ * @param string|array $roles
+ * @param string $redirect
+ */
+function requireRole($roles, string $redirect = 'index.php'): void {
+    if (!hasRole($roles)) {
+        if (!isset($_SESSION['user_id'])) {
+            header('Location: login.php');
+        } else {
+            header("Location: $redirect");
+        }
+        exit;
+    }
+}
+
+/**
+ * Check if user is logged in
+ * 
+ * @return bool
+ */
+function isLoggedIn(): bool {
+    return isset($_SESSION['user_id']);
 }

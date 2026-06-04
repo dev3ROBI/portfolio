@@ -1,6 +1,6 @@
 User-agent: *
 Allow: /
-Disallow: /admin/
+Disallow: /dashboard-x92/
 Disallow: /config/
 Disallow: /includes/
 Disallow: /uploads/

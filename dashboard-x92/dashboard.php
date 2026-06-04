@@ -5,20 +5,8 @@
  */
 require_once __DIR__ . '/../config/database.php';
 
-// Auth check with session timeout
-$sessionTimeout = 3600; // 1 hour
-
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
-}
-
-if (isset($_SESSION['admin_last_activity']) && (time() - $_SESSION['admin_last_activity'] > $sessionTimeout)) {
-    session_destroy();
-    header('Location: login.php');
-    exit;
-}
-$_SESSION['admin_last_activity'] = time();
+// Auth check
+requireRole('admin', '../login.php');
 
 $totalProjects = dbGetRow("SELECT COUNT(*) as count FROM projects")['count'] ?? 0;
 $totalMessages = dbGetRow("SELECT COUNT(*) as count FROM contact_messages")['count'] ?? 0;
@@ -41,7 +29,7 @@ $totalSkills = dbGetRow("SELECT COUNT(*) as count FROM skills")['count'] ?? 0;
             <nav>
                 <a href="dashboard.php" class="active"><i class="fas fa-chart-bar"></i> Dashboard</a>
                 <a href="projects.php"><i class="fas fa-code"></i> Projects</a>
-                <a href="login.php?logout=1" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="../logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
 
@@ -49,7 +37,7 @@ $totalSkills = dbGetRow("SELECT COUNT(*) as count FROM skills")['count'] ?? 0;
             <div class="admin-header">
                 <h1>Dashboard</h1>
                 <div class="user-info">
-                    <span><i class="fas fa-user"></i> <?php echo sanitizeOutput($_SESSION['admin_username'] ?? 'Admin'); ?></span>
+                    <span><i class="fas fa-user"></i> <?php echo sanitizeOutput($_SESSION['user_display_name'] ?? 'Admin'); ?></span>
                 </div>
             </div>
 
@@ -109,13 +97,5 @@ $totalSkills = dbGetRow("SELECT COUNT(*) as count FROM skills")['count'] ?? 0;
         </main>
     </div>
 
-    <?php
-    // Handle logout
-    if (isset($_GET['logout'])) {
-        session_destroy();
-        header('Location: login.php');
-        exit;
-    }
-    ?>
 </body>
 </html>

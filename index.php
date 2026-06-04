@@ -10,51 +10,51 @@ include 'includes/header.php';
 ?>
 
 <!-- Hero Section -->
-<section class="hero" aria-label="Hero introduction">
+<section class="hero hero--premium" aria-label="Hero introduction">
+    <div class="hero__background">
+        <div class="hero__glow hero__glow--1"></div>
+        <div class="hero__glow hero__glow--2"></div>
+    </div>
     <div class="container">
-        <div class="hero__content">
+        <div class="hero__content reveal">
             <div class="hero__badge">
                 <span class="hero__badge-dot"></span>
-                Available for projects
+                <span class="hero__badge-text">Open for Collaboration</span>
             </div>
 
-            <p class="hero__greeting">Hello, I'm</p>
+            <p class="hero__greeting">Hi there, I'm</p>
             <h1 class="hero__name">Robiul Islam</h1>
 
-            <div class="hero__title">
-                <span class="hero__typing" data-texts='["Web Developer","PHP Developer","API Developer","Software Engineer","Problem Solver"]'></span>
+            <div class="hero__title-container">
+                <span class="hero__typing" data-texts='["Full-Stack Web Architect","PHP & MySQL Specialist","REST API Developer","UI/UX Enthusiast","Performance Optimizer"]'></span>
             </div>
 
             <p class="hero__description">
-                I build modern, scalable web applications and APIs. 
-                Passionate about clean code, creative solutions, and turning complex problems into elegant digital experiences.
+                Crafting high-performance digital solutions with precision and passion. 
+                Specializing in robust backends, interactive frontends, and seamless API integrations.
             </p>
 
             <div class="hero__actions">
-                <a href="projects.php" class="btn btn--primary">
-                    <i class="fas fa-briefcase"></i> View My Work
+                <a href="projects.php" class="btn btn--primary btn--lg">
+                    <span class="btn__icon"><i class="fas fa-rocket"></i></span>
+                    <span class="btn__text">Explore Projects</span>
                 </a>
-                <a href="contact.php" class="btn btn--secondary">
-                    <i class="fas fa-envelope"></i> Get In Touch
-                </a>
-                <a href="about.php" class="btn btn--ghost">
-                    <i class="fas fa-user"></i> About Me
+                <a href="contact.php" class="btn btn--secondary btn--lg">
+                    <span class="btn__icon"><i class="fas fa-paper-plane"></i></span>
+                    <span class="btn__text">Let's Talk</span>
                 </a>
             </div>
 
-            <div class="hero__socials">
-                <a href="https://github.com/dev3ROBI" target="_blank" rel="noopener noreferrer" class="hero__social-link" aria-label="GitHub">
-                    <i class="fab fa-github"></i>
-                </a>
-                <a href="https://www.facebook.com/iam.robi69/" target="_blank" rel="noopener noreferrer" class="hero__social-link" aria-label="Facebook">
-                    <i class="fab fa-facebook"></i>
-                </a>
-                <a href="mailto:iam.robi693@gmail.com" class="hero__social-link" aria-label="Email">
-                    <i class="fas fa-envelope"></i>
-                </a>
-                <a href="https://me.robicodes.xyz" target="_blank" rel="noopener noreferrer" class="hero__social-link" aria-label="Portfolio">
-                    <i class="fas fa-globe"></i>
-                </a>
+            <div class="hero__tech-stack">
+                <span class="hero__tech-label">Core Stack:</span>
+                <div class="hero__tech-icons">
+                    <i class="fab fa-php" title="PHP"></i>
+                    <i class="fab fa-js" title="JavaScript"></i>
+                    <i class="fab fa-python" title="Python"></i>
+                    <i class="fab fa-react" title="React"></i>
+                    <i class="fab fa-node-js" title="Node.js"></i>
+                    <i class="fas fa-database" title="MySQL/PostgreSQL"></i>
+                </div>
             </div>
         </div>
     </div>
@@ -94,29 +94,44 @@ include 'includes/header.php';
                              alt="<?php echo sanitizeOutput($project['title']); ?>" 
                              loading="lazy">
                     <?php else: ?>
-                        <i class="fas fa-code" style="font-size:2rem;color:var(--text-muted)"></i>
+                        <div class="project-card__placeholder">
+                            <i class="fas fa-code"></i>
+                        </div>
                     <?php endif; ?>
-                    <span class="project-card__featured">Featured</span>
+                    <div class="project-card__overlay">
+                        <div class="project-card__actions">
+                            <?php if ($project['github_url']): ?>
+                                <a href="<?php echo sanitizeOutput($project['github_url']); ?>" 
+                                   target="_blank" rel="noopener noreferrer" 
+                                   class="btn-icon" aria-label="View Code"><i class="fab fa-github"></i></a>
+                            <?php endif; ?>
+                            <?php if ($project['live_url']): ?>
+                                <a href="<?php echo sanitizeOutput($project['live_url']); ?>" 
+                                   target="_blank" rel="noopener noreferrer" 
+                                   class="btn-icon" aria-label="Live Demo"><i class="fas fa-external-link-alt"></i></a>
+                            <?php endif; ?>
+                        </div>
+                    </div>
                 </div>
                 <div class="project-card__body">
+                    <div class="project-card__header">
+                        <span class="project-card__category"><?php echo sanitizeOutput($project['category_name'] ?? 'Web'); ?></span>
+                        <?php if ($project['featured']): ?>
+                            <span class="project-card__badge">Featured</span>
+                        <?php endif; ?>
+                    </div>
                     <h3 class="project-card__title"><?php echo sanitizeOutput($project['title']); ?></h3>
                     <p class="project-card__description"><?php echo sanitizeOutput($desc); ?>...</p>
-                    <div class="project-card__techs">
-                        <?php foreach ($techs as $tech): ?>
-                            <span class="project-card__tech"><?php echo sanitizeOutput($tech); ?></span>
-                        <?php endforeach; ?>
-                    </div>
-                    <div class="project-card__actions">
-                        <?php if ($project['github_url']): ?>
-                            <a href="<?php echo sanitizeOutput($project['github_url']); ?>" 
-                               target="_blank" rel="noopener noreferrer" 
-                               class="btn btn--ghost btn--sm"><i class="fas fa-link"></i> Code</a>
-                        <?php endif; ?>
-                        <?php if ($project['live_url']): ?>
-                            <a href="<?php echo sanitizeOutput($project['live_url']); ?>" 
-                               target="_blank" rel="noopener noreferrer" 
-                               class="btn btn--primary btn--sm"><i class="fas fa-rocket"></i> Live</a>
-                        <?php endif; ?>
+                    <div class="project-card__footer">
+                        <div class="project-card__techs">
+                            <?php foreach (array_slice($techs, 0, 3) as $tech): ?>
+                                <span class="project-card__tech"><?php echo sanitizeOutput($tech); ?></span>
+                            <?php endforeach; ?>
+                            <?php if (count($techs) > 3): ?>
+                                <span class="project-card__tech">+<?php echo count($techs) - 3; ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <a href="projects.php?id=<?php echo $project['id']; ?>" class="btn-text">Details <i class="fas fa-arrow-right"></i></a>
                     </div>
                 </div>
             </article>

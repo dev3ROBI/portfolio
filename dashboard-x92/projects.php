@@ -5,20 +5,8 @@
  */
 require_once __DIR__ . '/../config/database.php';
 
-// Auth check with session timeout
-$sessionTimeout = 3600; // 1 hour
-
-if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    header('Location: login.php');
-    exit;
-}
-
-if (isset($_SESSION['admin_last_activity']) && (time() - $_SESSION['admin_last_activity'] > $sessionTimeout)) {
-    session_destroy();
-    header('Location: login.php');
-    exit;
-}
-$_SESSION['admin_last_activity'] = time();
+// Auth check
+requireRole('admin', '../login.php');
 
 $message = '';
 $messageType = '';
@@ -163,7 +151,7 @@ $categories = dbGetAll("SELECT * FROM categories ORDER BY name ASC");
             <nav>
                 <a href="dashboard.php"><i class="fas fa-chart-bar"></i> Dashboard</a>
                 <a href="projects.php" class="active"><i class="fas fa-code"></i> Projects</a>
-                <a href="dashboard.php?logout=1" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                <a href="../logout.php" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
 
