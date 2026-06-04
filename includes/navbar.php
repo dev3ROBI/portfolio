@@ -29,7 +29,7 @@
             <li role="none"><a href="contact.php" class="navbar__link" role="menuitem">Contact</a></li>
             <li role="none">
                 <button class="theme-toggle" aria-label="Toggle theme">
-                    <span class="theme-toggle__thumb" aria-hidden="true">&#9790;</span>
+                    <span class="theme-toggle__thumb" aria-hidden="true"><i class="fas fa-moon" id="theme-icon"></i></span>
                 </button>
             </li>
         </ul>

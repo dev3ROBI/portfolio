@@ -23,7 +23,7 @@ $stats = dbGetAll("SELECT * FROM statistics ORDER BY sort_order ASC");
             <?php foreach ($stats as $stat): ?>
             <div class="stat-card glass-card reveal">
                 <div class="stat-card__icon">
-                    &#128202;
+                    <i class="fas fa-chart-bar"></i>
                 </div>
                 <div class="stat-card__value" 
                      data-target="<?php echo (int)$stat['value']; ?>" 

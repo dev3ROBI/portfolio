@@ -32,28 +32,28 @@ include 'includes/header.php';
 
             <div class="hero__actions">
                 <a href="projects.php" class="btn btn--primary">
-                    &#128188; View My Work
+                    <i class="fas fa-briefcase"></i> View My Work
                 </a>
                 <a href="contact.php" class="btn btn--secondary">
-                    &#128231; Get In Touch
+                    <i class="fas fa-envelope"></i> Get In Touch
                 </a>
                 <a href="about.php" class="btn btn--ghost">
-                    &#128100; About Me
+                    <i class="fas fa-user"></i> About Me
                 </a>
             </div>
 
             <div class="hero__socials">
                 <a href="https://github.com/dev3ROBI" target="_blank" rel="noopener noreferrer" class="hero__social-link" aria-label="GitHub">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+                    <i class="fab fa-github"></i>
                 </a>
                 <a href="https://www.facebook.com/iam.robi69/" target="_blank" rel="noopener noreferrer" class="hero__social-link" aria-label="Facebook">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                    <i class="fab fa-facebook"></i>
                 </a>
                 <a href="mailto:iam.robi693@gmail.com" class="hero__social-link" aria-label="Email">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    <i class="fas fa-envelope"></i>
                 </a>
                 <a href="https://me.robicodes.xyz" target="_blank" rel="noopener noreferrer" class="hero__social-link" aria-label="Portfolio">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                    <i class="fas fa-globe"></i>
                 </a>
             </div>
         </div>
@@ -94,7 +94,7 @@ include 'includes/header.php';
                              alt="<?php echo sanitizeOutput($project['title']); ?>" 
                              loading="lazy">
                     <?php else: ?>
-                        &#128187;
+                        <i class="fas fa-code" style="font-size:2rem;color:var(--text-muted)"></i>
                     <?php endif; ?>
                     <span class="project-card__featured">Featured</span>
                 </div>
@@ -110,12 +110,12 @@ include 'includes/header.php';
                         <?php if ($project['github_url']): ?>
                             <a href="<?php echo sanitizeOutput($project['github_url']); ?>" 
                                target="_blank" rel="noopener noreferrer" 
-                               class="btn btn--ghost btn--sm">&#128279; Code</a>
+                               class="btn btn--ghost btn--sm"><i class="fas fa-link"></i> Code</a>
                         <?php endif; ?>
                         <?php if ($project['live_url']): ?>
                             <a href="<?php echo sanitizeOutput($project['live_url']); ?>" 
                                target="_blank" rel="noopener noreferrer" 
-                               class="btn btn--primary btn--sm">&#128640; Live</a>
+                               class="btn btn--primary btn--sm"><i class="fas fa-rocket"></i> Live</a>
                         <?php endif; ?>
                     </div>
                 </div>
@@ -124,7 +124,7 @@ include 'includes/header.php';
         </div>
 
         <div style="text-align:center;margin-top:var(--spacing-2xl)" class="reveal">
-            <a href="projects.php" class="btn btn--primary">View All Projects &#8594;</a>
+            <a href="projects.php" class="btn btn--primary">View All Projects <i class="fas fa-arrow-right"></i></a>
         </div>
     </div>
 </section>
@@ -138,7 +138,7 @@ include 'includes/header.php';
             foreach ($stats as $stat):
             ?>
             <div class="stat-card glass-card reveal">
-                <div class="stat-card__icon">&#128202;</div>
+                <div class="stat-card__icon"><i class="fas fa-chart-bar"></i></div>
                 <div class="stat-card__value" 
                      data-target="<?php echo (int)$stat['value']; ?>" 
                      data-suffix="<?php echo sanitizeOutput($stat['suffix']); ?>">

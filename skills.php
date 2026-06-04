@@ -9,11 +9,11 @@ $pageDescription = 'Technical skills and expertise of Robiul Islam (RobiCodes) i
 include 'includes/header.php';
 
 $categoryLabels = [
-    'frontend' => ['Frontend Development', '&#127912;'],
-    'backend' => ['Backend Development', '&#9881;'],
-    'database' => ['Database Management', '&#128451;'],
-    'devops' => ['DevOps & Version Control', '&#128736;'],
-    'tools' => ['Tools & Platforms', '&#128295;'],
+    'frontend' => ['Frontend Development', '<i class="fas fa-palette"></i>'],
+    'backend' => ['Backend Development', '<i class="fas fa-cog"></i>'],
+    'database' => ['Database Management', '<i class="fas fa-database"></i>'],
+    'devops' => ['DevOps & Version Control', '<i class="fas fa-wrench"></i>'],
+    'tools' => ['Tools & Platforms', '<i class="fas fa-tools"></i>'],
 ];
 
 $skills = dbGetAll("SELECT * FROM skills ORDER BY display_order ASC");
@@ -42,7 +42,7 @@ foreach ($skills as $s) {
         <!-- Skill Bars by Category -->
         <div class="skills__grid">
             <?php foreach ($grouped as $category => $categorySkills): 
-                $label = $categoryLabels[$category] ?? [$category, '&#128196;'];
+                $label = $categoryLabels[$category] ?? [$category, '<i class="fas fa-file-alt"></i>'];
             ?>
             <div class="skills__category glass-card reveal">
                 <h3 class="skills__category-title">

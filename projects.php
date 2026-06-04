@@ -27,7 +27,7 @@ $projects = dbGetAll(
         <!-- Controls -->
         <div class="projects__controls reveal">
             <div class="projects__search">
-                <span class="projects__search-icon">&#128269;</span>
+                <span class="projects__search-icon"><i class="fas fa-search"></i></span>
                 <input type="text" class="projects__search-input" placeholder="Search projects..." aria-label="Search projects">
             </div>
             <div class="projects__filters" role="tablist" aria-label="Filter by category">
@@ -64,7 +64,7 @@ $projects = dbGetAll(
                              alt="<?php echo sanitizeOutput($project['title']); ?>" 
                              loading="lazy">
                     <?php else: ?>
-                        &#128187;
+                        <i class="fas fa-code" style="font-size:2rem;color:var(--text-muted)"></i>
                     <?php endif; ?>
                     <?php if ($project['featured']): ?>
                         <span class="project-card__featured">Featured</span>
@@ -87,18 +87,18 @@ $projects = dbGetAll(
                             <a href="<?php echo sanitizeOutput($project['github_url']); ?>" 
                                target="_blank" rel="noopener noreferrer" 
                                class="btn btn--ghost btn--sm">
-                                &#128279; Source
+                                <i class="fas fa-link"></i> Source
                             </a>
                         <?php endif; ?>
                         <?php if ($project['live_url']): ?>
                             <a href="<?php echo sanitizeOutput($project['live_url']); ?>" 
                                target="_blank" rel="noopener noreferrer" 
                                class="btn btn--primary btn--sm">
-                                &#128640; Live Demo
+                                <i class="fas fa-rocket"></i> Live Demo
                             </a>
                         <?php else: ?>
                             <span class="btn btn--ghost btn--sm" style="opacity:0.5;cursor:default">
-                                &#128274; Private
+                                <i class="fas fa-lock"></i> Private
                             </span>
                         <?php endif; ?>
                     </div>

@@ -1166,6 +1166,12 @@ a:hover {
     text-align: center;
     padding: var(--spacing-2xl);
     position: relative;
+    transition: all var(--transition-base);
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-glow-strong);
 }
 
 .stat-card__icon {
@@ -1223,6 +1229,18 @@ a:hover {
     display: flex;
     align-items: flex-start;
     gap: var(--spacing-md);
+    padding: var(--spacing-sm) 0;
+    transition: all var(--transition-base);
+}
+
+.contact__info-item:hover {
+    transform: translateX(4px);
+}
+
+.contact__info-item:hover .contact__info-icon {
+    background: var(--gradient-primary);
+    color: white;
+    box-shadow: 0 4px 15px rgba(108, 92, 231, 0.3);
 }
 
 .contact__info-icon {
@@ -1236,6 +1254,7 @@ a:hover {
     justify-content: center;
     font-size: var(--font-size-lg);
     color: var(--primary-light);
+    transition: all var(--transition-base);
 }
 
 .contact__info-text h4 {
@@ -1367,8 +1386,8 @@ a:hover {
 }
 
 .back-to-top:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.5);
+    transform: translateY(-4px) scale(1.1);
+    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.6);
 }
 
 /* ===== Toast Notifications ===== */

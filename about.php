@@ -19,7 +19,7 @@ include 'includes/header.php';
         <div class="about__grid">
             <div class="about__image-wrapper reveal">
                 <div class="about__image">
-                    &#128100;
+                    <i class="fas fa-user fa-4x"></i>
                 </div>
                 <div class="about__image-stats">
                     <div class="about__stat glass-card">
@@ -68,7 +68,7 @@ include 'includes/header.php';
                 </p>
 
                 <a href="contact.php" class="btn btn--primary" style="margin-top:var(--spacing-md)">
-                    Let's Work Together &#8594;
+                    Let's Work Together <i class="fas fa-arrow-right"></i>
                 </a>
             </div>
         </div>

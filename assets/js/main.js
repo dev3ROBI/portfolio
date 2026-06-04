@@ -33,16 +33,23 @@ document.addEventListener('DOMContentLoaded', () => {
     ================================================================ */
     const themeToggle = document.querySelector('.theme-toggle');
     const html = document.documentElement;
+    const themeIcon = document.getElementById('theme-icon');
 
     if (themeToggle) {
         const saved = localStorage.getItem('theme') || 'dark';
         html.setAttribute('data-theme', saved);
+        if (themeIcon) {
+            themeIcon.className = saved === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+        }
 
         themeToggle.addEventListener('click', () => {
             const current = html.getAttribute('data-theme');
             const next = current === 'dark' ? 'light' : 'dark';
             html.setAttribute('data-theme', next);
             localStorage.setItem('theme', next);
+            if (themeIcon) {
+                themeIcon.className = next === 'dark' ? 'fas fa-moon' : 'fas fa-sun';
+            }
         });
     }
 

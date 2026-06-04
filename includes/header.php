@@ -44,6 +44,9 @@ $pageUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' 
     <meta name="twitter:description" content="<?php echo sanitizeOutput($pageDescription); ?>">
     <meta name="twitter:image" content="<?php echo sanitizeOutput($pageImage); ?>">
 
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
     <!-- Preload Fonts & Critical CSS -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -95,7 +98,7 @@ $pageUrl = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? 'https://' 
     <div class="toast-container" aria-live="polite"></div>
 
     <!-- Back to Top -->
-    <button class="back-to-top" aria-label="Back to top">&#8593;</button>
+    <button class="back-to-top" aria-label="Back to top"><i class="fas fa-arrow-up"></i></button>
 
     <?php include 'includes/navbar.php'; ?>
 

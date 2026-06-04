@@ -3,36 +3,55 @@
  * Admin Projects Management
  * CRUD operations for portfolio projects
  */
-session_start();
 require_once __DIR__ . '/../config/database.php';
 
-// Auth check
+// Auth check with session timeout
+$sessionTimeout = 3600; // 1 hour
+
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: login.php');
     exit;
 }
+
+if (isset($_SESSION['admin_last_activity']) && (time() - $_SESSION['admin_last_activity'] > $sessionTimeout)) {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+$_SESSION['admin_last_activity'] = time();
 
 $message = '';
 $messageType = '';
 
 // Handle Delete
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-    try {
-        $project = dbGetRow("SELECT * FROM projects WHERE id = ?", 'i', [(int)$_GET['delete']]);
-        if ($project && $project['thumbnail'] && file_exists($project['thumbnail'])) {
-            unlink($project['thumbnail']);
-        }
-        dbExecute("DELETE FROM projects WHERE id = ?", 'i', [(int)$_GET['delete']]);
-        $message = 'Project deleted successfully.';
-        $messageType = 'success';
-    } catch (Exception $e) {
-        $message = 'Failed to delete project.';
+    if (!isset($_GET['csrf_token']) || !verifyCSRFToken($_GET['csrf_token'])) {
+        $message = 'Invalid request. Please try again.';
         $messageType = 'error';
+    } else {
+        try {
+            $project = dbGetRow("SELECT * FROM projects WHERE id = ?", 'i', [(int)$_GET['delete']]);
+            if ($project && $project['thumbnail'] && file_exists($project['thumbnail'])) {
+                unlink($project['thumbnail']);
+            }
+            dbExecute("DELETE FROM projects WHERE id = ?", 'i', [(int)$_GET['delete']]);
+            $message = 'Project deleted successfully.';
+            $messageType = 'success';
+        } catch (Exception $e) {
+            $message = 'Failed to delete project.';
+            $messageType = 'error';
+        }
     }
+    // Regenerate token after delete
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 }
 
 // Handle Add/Edit
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
+    if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
+        $message = 'Invalid form submission. Please try again.';
+        $messageType = 'error';
+    } else {
     $title = trim($_POST['title'] ?? '');
     $slug = trim($_POST['slug'] ?? '');
     $description = trim($_POST['description'] ?? '');
@@ -53,9 +72,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     // Handle thumbnail upload
     $thumbnail = null;
     if (isset($_FILES['thumbnail']) && $_FILES['thumbnail']['error'] === UPLOAD_ERR_OK) {
-        $allowed = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
-        if (in_array($_FILES['thumbnail']['type'], $allowed)) {
-            $ext = pathinfo($_FILES['thumbnail']['name'], PATHINFO_EXTENSION);
+        $allowedExts = ['jpg', 'jpeg', 'png', 'webp', 'gif'];
+        $ext = strtolower(pathinfo($_FILES['thumbnail']['name'], PATHINFO_EXTENSION));
+        
+        // Validate by file content (server-side)
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $mime = finfo_file($finfo, $_FILES['thumbnail']['tmp_name']);
+        finfo_close($finfo);
+        $allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+        
+        // Enforce file size limit (5MB)
+        $maxSize = 5 * 1024 * 1024;
+        
+        if (in_array($ext, $allowedExts) && in_array($mime, $allowedMimes) && $_FILES['thumbnail']['size'] <= $maxSize) {
             $filename = uniqid('project_') . '.' . $ext;
             $dest = __DIR__ . '/../uploads/' . $filename;
             
@@ -100,6 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $message = 'Error saving project: ' . $e->getMessage();
         $messageType = 'error';
     }
+    }
 }
 
 // Get project for editing
@@ -131,9 +161,9 @@ $categories = dbGetAll("SELECT * FROM categories ORDER BY name ASC");
         <aside class="admin-sidebar">
             <h2>RobiCodes</h2>
             <nav>
-                <a href="dashboard.php">&#128202; Dashboard</a>
-                <a href="projects.php" class="active">&#128187; Projects</a>
-                <a href="dashboard.php?logout=1" class="logout-btn">&#128682; Logout</a>
+                <a href="dashboard.php"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                <a href="projects.php" class="active"><i class="fas fa-code"></i> Projects</a>
+                <a href="dashboard.php?logout=1" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
 
@@ -141,7 +171,7 @@ $categories = dbGetAll("SELECT * FROM categories ORDER BY name ASC");
             <div class="admin-header">
                 <h1><?php echo $editProject ? 'Edit Project' : 'Manage Projects'; ?></h1>
                 <a href="projects.php" class="btn btn--ghost btn--sm">
-                    <?php echo $editProject ? '&#8592; Back to List' : '+ Add New'; ?>
+                    <?php echo $editProject ? '<i class="fas fa-arrow-left"></i> Back to List' : '+ Add New'; ?>
                 </a>
             </div>
 
@@ -153,6 +183,7 @@ $categories = dbGetAll("SELECT * FROM categories ORDER BY name ASC");
             <div class="glass-card" style="padding:1.5rem;margin-bottom:2rem">
                 <form method="POST" action="" enctype="multipart/form-data" class="admin-form">
                     <input type="hidden" name="action" value="<?php echo $editProject ? 'edit' : 'add'; ?>">
+                    <input type="hidden" name="csrf_token" value="<?php echo generateCSRFToken(); ?>">
                     <?php if ($editProject): ?>
                         <input type="hidden" name="id" value="<?php echo $editProject['id']; ?>">
                     <?php endif; ?>
@@ -254,7 +285,7 @@ $categories = dbGetAll("SELECT * FROM categories ORDER BY name ASC");
                     </div>
 
                     <button type="submit" class="btn btn--primary">
-                        <?php echo $editProject ? '&#128190; Update Project' : '&#128190; Add Project'; ?>
+                        <?php echo $editProject ? '<i class="fas fa-save"></i> Update Project' : '<i class="fas fa-save"></i> Add Project'; ?>
                     </button>
                 </form>
             </div>
@@ -281,10 +312,10 @@ $categories = dbGetAll("SELECT * FROM categories ORDER BY name ASC");
                                 <td style="font-weight:500"><?php echo sanitizeOutput($proj['title']); ?></td>
                                 <td><?php echo sanitizeOutput($proj['category_name'] ?? 'Uncategorized'); ?></td>
                                 <td><?php echo sanitizeOutput(ucfirst($proj['status'])); ?></td>
-                                <td><?php echo $proj['featured'] ? '&#9733;' : '&#9734;'; ?></td>
+                                <td><?php echo $proj['featured'] ? '<i class="fas fa-star" style="color:#fdcb6e"></i>' : '<i class="far fa-star" style="color:#6c6c8a"></i>'; ?></td>
                                 <td class="actions">
                                     <a href="?edit=<?php echo $proj['id']; ?>" class="btn btn--ghost btn--sm">Edit</a>
-                                    <a href="?delete=<?php echo $proj['id']; ?>" 
+                                    <a href="?delete=<?php echo $proj['id']; ?>&amp;csrf_token=<?php echo generateCSRFToken(); ?>" 
                                        class="btn btn--ghost btn--sm" 
                                        style="color:#fd79a8"
                                        onclick="return confirm('Delete this project?')">Delete</a>

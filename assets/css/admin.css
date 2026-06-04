@@ -77,7 +77,16 @@
 
 .login-card input:focus {
     border-color: #a29bfe;
-    box-shadow: 0 0 20px rgba(108,92,231,0.1);
+    box-shadow: 0 0 20px rgba(108,92,231,0.2);
+}
+
+.login-card input:hover {
+    border-color: rgba(162,155,254,0.3);
+}
+
+.login-card .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(108,92,231,0.5);
 }
 
 .login-card .btn {
@@ -144,7 +153,21 @@
 
 .admin-sidebar nav a:hover,
 .admin-sidebar nav a.active {
-    background: rgba(108,92,231,0.1);
+    background: rgba(108,92,231,0.15);
+    color: #a29bfe;
+}
+
+.admin-sidebar nav a i {
+    width: 20px;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+.admin-sidebar nav a:hover i {
+    transform: scale(1.15);
+}
+
+.admin-sidebar nav a.active i {
     color: #a29bfe;
 }
 
@@ -304,6 +327,14 @@
     border: 1px solid rgba(255,255,255,0.08);
     border-radius: 1.25rem;
     padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.admin-card:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(162,155,254,0.2);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(108,92,231,0.1);
 }
 
 .admin-card h3 {

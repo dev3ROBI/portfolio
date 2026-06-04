@@ -6,6 +6,20 @@
  * Implements singleton pattern for connection reuse.
  */
 
+// Secure session configuration
+if (session_status() === PHP_SESSION_NONE) {
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
+    ini_set('session.cookie_samesite', 'Strict');
+    ini_set('session.use_only_cookies', 1);
+    
+    if (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') {
+        ini_set('session.cookie_secure', 1);
+    }
+    
+    session_start();
+}
+
 define('DB_HOST', getenv('DB_HOST') ?: 'localhost');
 define('DB_NAME', getenv('DB_NAME') ?: 'robicodes_portfolio');
 define('DB_USER', getenv('DB_USER') ?: 'root');

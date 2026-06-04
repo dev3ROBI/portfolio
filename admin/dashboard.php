@@ -3,14 +3,22 @@
  * Admin Dashboard
  * Overview of portfolio statistics and quick management
  */
-session_start();
 require_once __DIR__ . '/../config/database.php';
 
-// Auth check
+// Auth check with session timeout
+$sessionTimeout = 3600; // 1 hour
+
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     header('Location: login.php');
     exit;
 }
+
+if (isset($_SESSION['admin_last_activity']) && (time() - $_SESSION['admin_last_activity'] > $sessionTimeout)) {
+    session_destroy();
+    header('Location: login.php');
+    exit;
+}
+$_SESSION['admin_last_activity'] = time();
 
 $totalProjects = dbGetRow("SELECT COUNT(*) as count FROM projects")['count'] ?? 0;
 $totalMessages = dbGetRow("SELECT COUNT(*) as count FROM contact_messages")['count'] ?? 0;
@@ -31,9 +39,9 @@ $totalSkills = dbGetRow("SELECT COUNT(*) as count FROM skills")['count'] ?? 0;
         <aside class="admin-sidebar">
             <h2>RobiCodes</h2>
             <nav>
-                <a href="dashboard.php" class="active">&#128202; Dashboard</a>
-                <a href="projects.php">&#128187; Projects</a>
-                <a href="login.php?logout=1" class="logout-btn">&#128682; Logout</a>
+                <a href="dashboard.php" class="active"><i class="fas fa-chart-bar"></i> Dashboard</a>
+                <a href="projects.php"><i class="fas fa-code"></i> Projects</a>
+                <a href="login.php?logout=1" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</a>
             </nav>
         </aside>
 
@@ -41,7 +49,7 @@ $totalSkills = dbGetRow("SELECT COUNT(*) as count FROM skills")['count'] ?? 0;
             <div class="admin-header">
                 <h1>Dashboard</h1>
                 <div class="user-info">
-                    <span>&#128100; <?php echo sanitizeOutput($_SESSION['admin_username'] ?? 'Admin'); ?></span>
+                    <span><i class="fas fa-user"></i> <?php echo sanitizeOutput($_SESSION['admin_username'] ?? 'Admin'); ?></span>
                 </div>
             </div>
 
@@ -91,7 +99,7 @@ $totalSkills = dbGetRow("SELECT COUNT(*) as count FROM skills")['count'] ?? 0;
                                 <td><?php echo sanitizeOutput($msg['email']); ?></td>
                                 <td><?php echo sanitizeOutput(substr($msg['subject'] ?? 'No subject', 0, 30)); ?></td>
                                 <td><?php echo date('M d, Y', strtotime($msg['created_at'])); ?></td>
-                                <td><?php echo $msg['is_read'] ? '&#10003; Read' : '&#9679; Unread'; ?></td>
+                                <td><?php echo $msg['is_read'] ? '<i class="fas fa-check-circle" style="color:#00cec9"></i> Read' : '<i class="fas fa-circle" style="color:#fdcb6e;font-size:0.6rem;vertical-align:middle"></i> Unread'; ?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
