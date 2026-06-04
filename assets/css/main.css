@@ -478,6 +478,11 @@ a:hover {
     display: flex;
     align-items: center;
     gap: var(--spacing-sm);
+    transition: opacity var(--transition-base);
+}
+
+.navbar__brand:hover {
+    opacity: 0.85;
 }
 
 .navbar__brand-text {
@@ -585,6 +590,11 @@ a:hover {
     display: flex;
     align-items: center;
     padding: 2px;
+}
+
+.theme-toggle:hover {
+    border-color: var(--primary-light);
+    box-shadow: 0 0 12px rgba(108, 92, 231, 0.15);
 }
 
 .theme-toggle__thumb {
@@ -1048,7 +1058,12 @@ a:hover {
     transition: all var(--transition-base);
 }
 
-.projects__filter-btn:hover,
+.projects__filter-btn:hover {
+    background: var(--bg-glass-hover);
+    border-color: var(--primary-light);
+    color: var(--primary-light);
+}
+
 .projects__filter-btn.active {
     background: var(--gradient-primary);
     border-color: transparent;
