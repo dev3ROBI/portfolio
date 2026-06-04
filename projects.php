@@ -72,6 +72,15 @@ if ($detailedProject):
 
 <?php else: ?>
 
+    <?php
+        if (!isset($categories)) {
+            $categories = [];
+        }
+        if (!isset($projects)) {
+            $projects = [];
+        }
+    ?>
+
 <section class="section hero" style="min-height:auto;padding-top:8rem" aria-label="Projects">
     <div class="container">
         <div class="section__header reveal">
