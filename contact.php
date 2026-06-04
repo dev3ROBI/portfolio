@@ -24,17 +24,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_SERVER['HTTP_X_REQUESTED_WI
         exit;
     }
     
-    $name = trim($_POST['name'] ?? '');
-    $email = trim($_POST['email'] ?? '');
-    $subject = trim($_POST['subject'] ?? '');
-    $message = trim($_POST['message'] ?? '');
+    $name = strip_tags(trim($_POST['name'] ?? ''));
+    $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
+    $subject = strip_tags(trim($_POST['subject'] ?? ''));
+    $message = strip_tags(trim($_POST['message'] ?? ''));
     
     $errors = [];
     
-    if (strlen($name) < 2) $errors[] = 'Name must be at least 2 characters.';
-    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Please provide a valid email.';
-    if (strlen($subject) < 3) $errors[] = 'Subject must be at least 3 characters.';
-    if (strlen($message) < 10) $errors[] = 'Message must be at least 10 characters.';
+    if (empty($name) || strlen($name) < 2) $errors[] = 'Name is too short.';
+    if (!filter_var($email, FILTER_VALIDATE_EMAIL)) $errors[] = 'Invalid email format.';
+    if (empty($subject) || strlen($subject) < 3) $errors[] = 'Subject is too short.';
+    if (empty($message) || strlen($message) < 10) $errors[] = 'Message must be at least 10 characters.';
     
     if (empty($errors)) {
         try {

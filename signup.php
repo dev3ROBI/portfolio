@@ -12,11 +12,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!isset($_POST['csrf_token']) || !verifyCSRFToken($_POST['csrf_token'])) {
         $error = 'Invalid form submission.';
     } else {
-        $username = trim($_POST['username'] ?? '');
-        $email = trim($_POST['email'] ?? '');
+        $username = strip_tags(trim($_POST['username'] ?? ''));
+        $email = filter_var(trim($_POST['email'] ?? ''), FILTER_SANITIZE_EMAIL);
         $password = $_POST['password'] ?? '';
         $confirmPassword = $_POST['confirm_password'] ?? '';
-        $displayName = trim($_POST['display_name'] ?? '');
+        $displayName = strip_tags(trim($_POST['display_name'] ?? ''));
         $masterKey = $_POST['master_key'] ?? '';
 
         if (empty($username) || empty($email) || empty($password) || empty($displayName) || empty($masterKey)) {

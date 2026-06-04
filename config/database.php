@@ -66,11 +66,19 @@ define('DB_CHARSET', 'utf8mb4');
  */
 function securityLog(string $event, string $level = 'info'): void {
     $ip = $_SERVER['REMOTE_ADDR'] ?? 'unknown';
-    $timestamp = date('Y-m-d H:i:s');
-    $logEntry = "[$timestamp] [$level] [$ip] $event" . PHP_EOL;
+    $timestamp = date('c'); // ISO 8601
+    $logData = [
+        'timestamp' => $timestamp,
+        'level' => $level,
+        'ip' => $ip,
+        'event' => $event,
+        'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? 'unknown',
+        'request_uri' => $_SERVER['REQUEST_URI'] ?? 'unknown'
+    ];
+    $logEntry = json_encode($logData) . PHP_EOL;
     $logDir = __DIR__ . '/../logs';
     if (!is_dir($logDir)) mkdir($logDir, 0755, true);
-    file_put_contents($logDir . '/security.log', $logEntry, FILE_APPEND);
+    file_put_contents($logDir . '/security.json.log', $logEntry, FILE_APPEND);
 }
 
 /**

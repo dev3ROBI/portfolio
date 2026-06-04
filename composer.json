@@ -1,0 +1,13 @@
+{
+    "name": "robicodes/portfolio",
+    "description": "RobiCodes Developer Portfolio",
+    "type": "project",
+    "require": {
+        "phpmailer/phpmailer": "^6.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    }
+}

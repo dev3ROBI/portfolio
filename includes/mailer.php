@@ -1,9 +1,14 @@
 <?php
 /**
- * Secure Mailer Utility
- * 
- * Provides a hardened wrapper for email delivery with strict header injection protection.
+ * Secure Mailer Utility using PHPMailer
  */
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
+
+require_once __DIR__ . '/../vendor/phpmailer/PHPMailer-master/src/Exception.php';
+require_once __DIR__ . '/../vendor/phpmailer/PHPMailer-master/src/PHPMailer.php';
+require_once __DIR__ . '/../vendor/phpmailer/PHPMailer-master/src/SMTP.php';
 
 /**
  * Send a secure email
@@ -16,46 +21,28 @@
  * @return bool
  */
 function sendSecureEmail(string $to, string $subject, string $message, string $fromEmail, string $fromName): bool {
-    // 1. Strict Sanitization
-    $to = filter_var($to, FILTER_SANITIZE_EMAIL);
-    $fromEmail = filter_var($fromEmail, FILTER_SANITIZE_EMAIL);
-    
-    // Remove any newlines from headers to prevent injection
-    $subject = str_replace(["\r", "\n"], '', $subject);
-    $fromName = str_replace(["\r", "\n"], '', $fromName);
-    
-    // 2. Validation
-    if (!filter_var($to, FILTER_VALIDATE_EMAIL) || !filter_var($fromEmail, FILTER_VALIDATE_EMAIL)) {
-        securityLog("Email validation failed for: $fromEmail", "warning");
-        return false;
-    }
+    $mail = new PHPMailer(true);
 
-    // 3. Construct Headers securely
-    // We use a fixed structure and avoid passing raw user input into the header string
-    $headers = [
-        'From' => "$fromName <$fromEmail>",
-        'Reply-To' => $fromEmail,
-        'X-Mailer' => 'PHP/' . phpversion(),
-        'MIME-Version' => '1.0',
-        'Content-Type' => 'text/plain; charset=UTF-8'
-    ];
-
-    $headerString = '';
-    foreach ($headers as $key => $value) {
-        $headerString .= "$key: $value\r\n";
-    }
-
-    // 4. Send and Log
     try {
-        $result = mail($to, $subject, $message, $headerString);
-        if ($result) {
-            securityLog("Email sent successfully from $fromEmail to $to", "info");
-        } else {
-            securityLog("Failed to send email from $fromEmail", "error");
-        }
-        return $result;
+        // Server settings
+        $mail->isMail(); // Using PHP mail() but via PHPMailer for secure header handling
+        $mail->CharSet = 'UTF-8';
+
+        // Recipients
+        $mail->setFrom('noreply@robicodes.xyz', 'Portfolio System');
+        $mail->addAddress($to);
+        $mail->addReplyTo($fromEmail, $fromName);
+
+        // Content
+        $mail->isHTML(false);
+        $mail->Subject = $subject;
+        $mail->Body    = "New message from: $fromName ($fromEmail)\n\n" . $message;
+
+        $mail->send();
+        securityLog("Email sent successfully using PHPMailer to $to", "info");
+        return true;
     } catch (Exception $e) {
-        securityLog("Mailer Exception: " . $e->getMessage(), "danger");
+        securityLog("PHPMailer Error: " . $mail->ErrorInfo, "danger");
         return false;
     }
 }
